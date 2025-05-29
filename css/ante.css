@@ -1,0 +1,202 @@
+body {
+    margin: 0;
+    font-family: sans-serif;
+    background-color: #202020;
+    color: #fff;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.griglia-ante {
+    display: grid;
+    grid-template-areas:
+        "s g g"
+        "s g g"
+        "s c c"
+        "s f f";
+    grid-template-columns: 1fr 2fr;
+    grid-template-rows: 1fr 2fr 1fr 1fr;
+    height: 100vh;
+    gap: 10px;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.griglia-ante > div {
+    border: 2px solid #444;
+    background-color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    min-height: 0; /* evita overflow */
+}
+
+.s{
+    background-color: #444;
+    grid-area: s;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 90%;
+    padding: 10px;
+}
+
+.j{
+    background-color: #444;
+    grid-area: j;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.a{
+    background-color: #444;
+    grid-area: a;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.g {
+    grid-area: g; /* Posiziona il contenuto sotto .j e .a */
+    display: flex;
+    justify-content: flex-start; /* Allinea le carte a sinistra */
+    align-items: center; /* Centra verticalmente le carte */
+    gap: 10px; /* Spazio tra le carte */
+    padding: 20px; /* Aggiunge un po' di spazio interno */
+    overflow-x: auto; /* Permette di scorrere orizzontalmente se ci sono troppe carte */
+}
+
+.c{
+    background-color: #444;
+    grid-area: c;
+    height: fit-content;
+    width: fit-content;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.carte-centrali {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    background-color: #0b3d0b;
+    border: 2px solid #064d06;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.carta {
+    width: 80px;
+    height: auto;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.carta:hover{
+    transform: translateY(-10px);
+    transform: rotateY(1px);
+    
+}
+
+.carta.selezionata {
+    box-shadow: 0 0 12px 4px rgba(255, 255, 100, 0.7);
+    border-radius: 5px;
+    transform: translateY(-10px);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.manoPoker{
+    font-size: larger;
+}
+
+.pila-scarti {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+    background-color: #222;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #555;
+}
+
+.area-scarti {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    padding: 10px;
+    background-color: #222;
+    border: 2px solid #444;
+    border-radius: 10px;
+}
+
+#dorsoScarti {
+    width: 60px; /* o 80px se vuoi uguale alle carte */
+    height: auto;
+    border-radius: 5px;
+    box-shadow: 0 0 5px #000;
+    transition: transform 0.3s ease;
+}
+
+
+.contatore-scarti {
+    font-size: 1rem;
+    font-weight: bold;
+    color: yellow;
+}
+
+@keyframes gira-e-vola {
+    0% {
+        transform: rotateY(0) scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: rotateY(90deg) scale(1.2);
+        opacity: 0.7;
+    }
+    100% {
+        transform: rotateY(180deg) scale(0.5) translateX(-200px) translateY(-10px);
+        opacity: 0;
+    }
+}
+
+.animazione-scarto {
+    animation: gira-e-vola 0.6s ease-in-out forwards;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.hud {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background-color: #2a2a2a;
+    border: 2px solid #555;
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 1rem;
+}
+
+.hud .stat {
+    color: #fff;
+    font-weight: bold;
+}
+
+.hud .stat span {
+    color: #ffd700;
+    font-weight: normal;
+}
+
+#giocaButton, #scartaButton{
+    height: fit-content;
+    width: fit-content;
+}
+#ordinaSemeRank, #ordinaNumero{
+    height: fit-content;
+    width: fit-content;
+}

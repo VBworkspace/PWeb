@@ -1,0 +1,56 @@
+body {
+    background-color: #111;
+    color: #fff;
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+
+.shop-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+}
+
+.shop-info, .shop-purchases {
+    background-color: #222;
+    padding: 20px;
+    border-radius: 10px;
+    width: 45%;
+    box-shadow: 0 0 10px #333;
+}
+
+h1, h3 {
+    color: #ffcc00;
+}
+
+.score, .multipliers, .run-info, .bottom-info {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #333;
+    border-radius: 5px;
+}
+
+.next-round {
+    width: 100%;
+    padding: 15px;
+    background-color: #4CAF50;
+    color: white;
+    font-size: 18px;
+    border: none;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    cursor: pointer;
+}
+
+.jokers, .voucher, .pack {
+    margin-top: 20px;
+}
+
+.joker-slot, .voucher-slot, .pack-slot {
+    background-color: #444;
+    margin-top: 10px;
+    padding: 15px;
+    border-radius: 5px;
+    text-align: center;
+}

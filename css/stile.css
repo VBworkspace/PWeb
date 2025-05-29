@@ -1,0 +1,123 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #111;
+    color: #fff;
+    text-align: center;
+    padding: 40px;
+}
+
+form {
+    background-color: #222;
+    padding: 20px;
+    border-radius: 10px;
+    display: inline-block;
+    box-shadow: 0 0 10px #333;
+}
+
+input, button {
+    margin: 10px 0;
+    padding: 10px;
+    width: 80%;
+    border: none;
+    border-radius: 5px;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+}
+
+.mancante{
+    border: 2px solid red !important;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #111;
+    color: #fff;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.balatro {
+    font-size: 5rem;
+    font-weight: bold;
+    text-align: center;
+    margin: 0;
+    color: #4CAF50;
+}
+
+.gioca {
+    padding: 15px;
+    font-size: 1.5rem;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-right: 20px; 
+}
+
+.gioca:hover {
+    background-color: #45a049;
+}
+
+.classifica {
+    padding: 10px;
+    font-size: 1rem;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.classifica:hover {
+    background-color: #e53935;
+}
+
+.user-icon {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    background-color: #555;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.3s ease;
+}
+
+.user-icon img {
+    width: 70%;
+    height: 70%;
+    object-fit: contain;
+}
+
+.user-icon:hover {
+    background-color: #888;
+}
+
+.hidden{
+    display: none !important;
+}
