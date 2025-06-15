@@ -81,18 +81,6 @@
                     <p>Punteggio: <span id="punteggioTotale"><?php echo $punteggio; ?></span></p>
                 </div>
 
-                <div class="multipliers">
-                    <h3>Moltiplicatori</h3>
-                    <p>x2 Punti</p>
-                    <p>x1,5 Monete</p>
-                </div>
-
-                <div class="run-info">
-                    <h3>Run Info</h3>
-                    <p>Mani rimanenti: <?php echo $_SESSION['mani_rimanenti']; ?></p>
-                    <p>Scarti disponibili: <?php echo $_SESSION['scarti_disponibili']; ?></p>
-                </div>
-
                 <div class="bottom-info">
                     <p>Options</p>
                     <p>Ante: <?php echo $_SESSION['ante']; ?></p>
@@ -104,33 +92,30 @@
             <div class="shop-purchases">
                 <button class="next-round" id="vaiGioco">Next Round</button>
 
-                <div class="jokers">
-                    <h3>Joker disponibili</h3>
-                    <div class="joker-slot">[Joker 1]</div>
-                    <div class="joker-slot">[Joker 2]</div>
+                <div class="upgrades">
+                    <h3>Upgrades disponibili</h3>
+                    <div class="upgrade-list">
+                        <div class="upgrade-slot">[+1 Mano]</div>
+                        <div class="upgrade-slot">[+1 Scarto]</div>
+                    </div>
                 </div>
-
-                <div class="voucher">
-                    <h3>Voucher disponibile</h3>
-                    <div class="voucher-slot">[Voucher]</div>
+               
+                <div class="upgrades-pianeti">
+                    <h3>Upgrade Mani di Poker</h3>
+                    <div class="pianeti">
+                        <div class="pianeti-slot">[Scala Reale]</div>
+                        <div class="pianeti-slot">[Scala Colore]</div>
+                        <div class="pianeti-slot">[Poker]</div>
+                        <div class="pianeti-slot">[Full House]</div>
+                        <div class="pianeti-slot">[Colore]</div>
+                        <div class="pianeti-slot">[Scala]</div>
+                        <div class="pianeti-slot">[Tris]</div>
+                        <div class="pianeti-slot">[Doppia Coppia]</div>
+                        <div class="pianeti-slot">[Coppia]</div>
+                        <div class="pianeti-slot">[Carta Alta]</div>
+                    </div>
                 </div>
-
-                <div class="pack">
-                    <h3>Pacchetto disponibile</h3>
-                    <div class="pack-slot">[Pacchetto]</div>
-                </div>
-
-                <!-- Powerup Section -->
-                <div class="powerup-section">
-                    <h3>Powerup</h3>
-                    <button class="item" data-costo="400" data-oggetto="Powerup 1">Powerup 1 - 400 punti</button>
-                    <button class="item" data-costo="700" data-oggetto="Powerup 2">Powerup 2 - 700 punti</button>
-                    <button class="item" data-costo="1000" data-oggetto="Powerup 3">Powerup 3 - 1000 punti</button>
-                </div>
-
-                <div class="reset-section">
-                    <button id="resetGame">Reset gioco</button>
-                </div>
+                
             </div>
         </div>
     </div>
@@ -144,6 +129,7 @@
                     <div class="stat"><strong>Mani rimaste:</strong> <span id="maniRimaste">3</span></div>
                     <div class="stat"><strong>Scarti disponibili:</strong> <span id="scartiDisponibili">2</span></div>
                 </div>
+                
             </div>
             <div class="c">
                 <!-- BOTTONE ORDINA AGGIUNTI -->
@@ -163,7 +149,7 @@
                 <div class="status"></div>
                 <div class="area-scarti">
                     <img id="dorsoScarti" src="../carte/dorso.svg" alt="Pila Scarti">
-                    <span class="contatore-scarti">0</span>
+                    
                 </div>
             </div>
         </div>

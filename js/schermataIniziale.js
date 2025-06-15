@@ -21,7 +21,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 body: JSON.stringify({ action: 'startGame' })
             });
             const result = await response.json();
-            if (result.success && result.targetDiv) {
+
+            const response2 = await fetch('../php/ante.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'inizializza' })
+            });
+            const result2 = await response2.json();
+
+            if (result.success && result.targetDiv && result2.success) {
                 mostraSolo(result.targetDiv);
             } else {
                 alert(result.message || 'Errore durante l\'avvio del gioco.'); 

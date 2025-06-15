@@ -10,7 +10,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (target) target.classList.remove("hidden");
     }
 
-
     const giocaBtn = document.getElementById("giocaBtn");
 
     if (giocaBtn) {
@@ -62,32 +61,38 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     const vaiGiocoBtn = document.getElementById("vaiGioco");
-    vaiGiocoBtn.addEventListener('click', async () => {
-        fetch('../php/ante.php', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ action: 'vaiAdAnte' })
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success && data.targetDiv) {
-                mostraSolo(data.targetDiv);
-            } else {
-                alert(data.message || 'Errore durante il passaggio alla fase Ante.'); 
-            }
+    if (vaiGiocoBtn) {
+        vaiGiocoBtn.addEventListener('click', () => {
+            fetch('../php/ante.php', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ action: 'vaiAdAnte' })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && data.targetDiv) {
+                    mostraSolo(data.targetDiv);
+                    // metti mani e scarti qui          //////////////////////////////////////////////
+                } else {
+                    alert(data.message || 'Errore durante il passaggio alla fase Ante.');
+                }
+            });
         });
-    });
+    }
 
-
-    //resetGameBtn.addEventListener('click', () => {
-    //    fetch('../php/ante.php', {
-    //        method: 'POST',
-    //        headers: { 'Content-Type': 'application/json' },
-    //        body: JSON.stringify({ action: 'reset' })
-    //    })
-    //    .then(() => {
-    //        alert('Gioco resettato!');
-    //        aggiornaPunteggio();
-    //    });
-    //});
+    // Opzionale: reset
+    // const resetGameBtn = document.getElementById('resetGameBtn');
+    // if (resetGameBtn) {
+    //     resetGameBtn.addEventListener('click', () => {
+    //         fetch('../php/ante.php', {
+    //             method: 'POST',
+    //             headers: { 'Content-Type': 'application/json' },
+    //             body: JSON.stringify({ action: 'reset' })
+    //         })
+    //         .then(() => {
+    //             alert('Gioco resettato!');
+    //             aggiornaPunteggio();
+    //         });
+    //     });
+    // }
 });

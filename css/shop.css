@@ -1,24 +1,45 @@
-body {
+body{
     background-color: #111;
     color: #fff;
     font-family: 'Arial', sans-serif;
     margin: 0;
-    padding: 20px;
+}
+#shopDiv {
+    height: 100%;
 }
 
 .shop-container {
     display: flex;
-    justify-content: space-between;
+    height: 100vh;
     padding: 20px;
+    gap: 20px;
+    box-sizing: border-box;
+    width: 100vw;
 }
 
-.shop-info, .shop-purchases {
+.shop-info {
+    flex-basis: 25%;
     background-color: #222;
     padding: 20px;
     border-radius: 10px;
-    width: 45%;
     box-shadow: 0 0 10px #333;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 80%;
 }
+
+.shop-purchases {
+    flex-basis: 65%;
+    background-color: #222;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px #333;
+    display: flex;
+    flex-direction: column;
+    height: 80%;
+}
+
 
 h1, h3 {
     color: #ffcc00;
@@ -42,15 +63,28 @@ h1, h3 {
     margin-bottom: 20px;
     cursor: pointer;
 }
-
-.jokers, .voucher, .pack {
-    margin-top: 20px;
+.upgrade-list{
+    flex: 1; /* Occupa spazio equamente */
 }
 
-.joker-slot, .voucher-slot, .pack-slot {
+.upgrade-slot {
     background-color: #444;
-    margin-top: 10px;
-    padding: 15px;
+    padding: 10px;
     border-radius: 5px;
     text-align: center;
+}
+
+
+.pianeti{
+    display: grid;  
+    grid-template-columns: 1fr 1fr;
+}
+
+.pianeti-slot{
+    background-color: #444;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+
 }
