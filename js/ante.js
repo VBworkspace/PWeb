@@ -12,13 +12,20 @@ document.addEventListener('DOMContentLoaded', () => {
         if (target) target.classList.remove("hidden");
     }
 
-    const areaScarti = document.querySelector('.area-scarti');
+    //const response = fetch('../php/ante.php', {
+    //    method: 'POST',
+    //    headers: { 'Content-Type': 'application/json' },
+    //    body: JSON.stringify({ action: 'checkUpgrades'})
+    //})
+    //const upMano = response.manoInPiu;
+    //const upScarto = response.scartoInPiu;
+    
+
     const areaCentrale = document.querySelector('.carte-centrali');
-    const areaMano = document.querySelector('.area-mano');
     const giocaButton = document.getElementById('giocaButton');
     const scartaButton = document.getElementById('scartaButton');
     const manoPokerDiv = document.querySelector('.manoPoker');
-    const contatoreScarti = document.querySelector('.contatore-scarti');
+    //const contatoreScarti = document.querySelector('.contatore-scarti');
     const punteggioSpan = document.getElementById('punteggio');
     const punteggioMinimoSpan = document.getElementById('punteggioMinimo');
     const maniRimasteSpan = document.getElementById('maniRimaste');
@@ -26,31 +33,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const ordinaNumeroBtn = document.getElementById('ordinaNumero');
     const ordinaSemeRankBtn = document.getElementById('ordinaSemeRank');
 
-    const MAX_CARTE = 5;
 
     let carteScartate = [];
-    let carteCentrali = [];  // <-- variabile globale per tracciare le carte correnti nell'area centrale
+    let carteCentrali = []; 
 
-    // === HUD ===
     const punteggiMinimi = [300, 450, 500, 650, 800, 1000];
+
+    // QUESTO BLOCCO VIENE CARICATO SOLO LA PRIMA VOLTA
     let roundCorrente = 0;
     let punteggioMinimo = punteggiMinimi[roundCorrente];
-    let punteggio = 0;
+    let punteggioCorrente = 0;
     let maniRimaste = 3;
     let scartiDisponibili = 2;
 
     function aggiornaHUD() {
-        punteggioSpan.textContent = punteggio;
+        punteggioSpan.textContent = punteggioCorrente;
         punteggioMinimoSpan.textContent = punteggioMinimo;
         maniRimasteSpan.textContent = maniRimaste;
         scartiDisponibiliSpan.textContent = scartiDisponibili;
+        console.log(maniRimaste);
+        console.log(scartiDisponibili);
     }
 
     function updatePilaScarti() {
-        contatoreScarti.textContent = carteScartate.length;
+        //contatoreScarti.textContent = carteScartate.length;
     }
 
-    // Mappa semi per ordine: cuori > quadri > fiori > picche
     const ordineSemi = {
         'cuori': 4,
         'quadri': 3,
@@ -58,13 +66,11 @@ document.addEventListener('DOMContentLoaded', () => {
         'picche': 1
     };
 
-    // Ordina per numero decrescente
-    function ordinaPerNumero(arr) {     //DEFAULT
+    function ordinaPerNumero(arr) {    
         numeroSelezionate = 0;
         return arr.sort((a, b) => b.numero - a.numero);
     }
 
-    // Ordina per seme (decrescente) e numero (decrescente)
     function ordinaPerSemeERank(arr) {
         return arr.sort((a, b) => {
             if (ordineSemi[b.seme] !== ordineSemi[a.seme]) {
@@ -97,12 +103,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     numeroSelezionate++;
                 }
             });
-            ordinaPerNumero(carte);
             areaCentrale.appendChild(img);
         });
     }
 
-    // Event listener bottoni ordina
     ordinaNumeroBtn.addEventListener('click', () => {
         carteCentrali = ordinaPerNumero(carteCentrali);
         renderCarte(carteCentrali);
@@ -113,7 +117,6 @@ document.addEventListener('DOMContentLoaded', () => {
         renderCarte(carteCentrali);
     });
 
-            // Resto del codice...
 
     function pescaNuoveCarte(n) {
         fetch('../php/ante.php', {
@@ -125,19 +128,18 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(data => {
             if (data.carte) {
                 const carteAttuali = [...areaCentrale.querySelectorAll('.carta')]
-                .filter(c => !c.classList.contains('selezionata'))  // Esclude quelle appena giocate
+                .filter(c => !c.classList.contains('selezionata'))
                 .map(c => ({
                     numero: parseInt(c.dataset.numero),
                     seme: c.dataset.seme
                 }));
-                carteCentrali = carteAttuali.concat(data.carte); // AGGIORNA carteCentrali!
+                carteCentrali = carteAttuali.concat(data.carte);
                 renderCarte(carteCentrali);
             }
         });
         carteScartate = [];
     }
 
-    // Carica stato da sessione
     function caricaStatoDaSessione() {
         return fetch('../php/ante.php', {
             method: 'POST',
@@ -147,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(res => res.json())
         .then(data => {
             if (data.round !== undefined) roundCorrente = data.round;
-            if (data.punteggioMassimo !== undefined) punteggio = data.punteggioMassimo;
+            if (data.punteggioMassimo !== undefined) punteggioCorrente = data.punteggioMassimo;
             punteggioMinimo = punteggiMinimi[roundCorrente] || punteggiMinimi[punteggiMinimi.length - 1];
             aggiornaHUD();
         })
@@ -157,7 +159,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Salva stato in sessione
     function salvaStatoInSessione() {
         return fetch('../php/ante.php', {
             method: 'POST',
@@ -165,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
             body: JSON.stringify({
                 action: 'salvaStato',
                 round: roundCorrente,
-                punteggioMassimo: punteggio
+                punteggioMassimo: punteggioCorrente
             })
         });
     }
@@ -182,13 +183,11 @@ document.addEventListener('DOMContentLoaded', () => {
         maniRimaste--;
         aggiornaHUD();
     
-        // Effetto visivo di scarto per giocate
         document.querySelectorAll('.carta.selezionata').forEach(c => {
             c.classList.add('animazione-scarto');
             setTimeout(() => c.remove(), 600);
         });
     
-        // Anche per eventuali carte scartate già rimosse
         setTimeout(() => {
             fetch('../php/ante.php', {
                 method: 'POST',
@@ -203,22 +202,25 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(data => {
                 manoPokerDiv.textContent = 'Mano: ' + (data.result ?? 'N/A');
                 if (data.punteggio) {
-                    punteggio += data.punteggio;
+                    punteggioCorrente += data.punteggio;
                 }
     
                 const numeroDaPescare = (data.scartiEffettivi ?? carteScartate.length) + carteGiocate.length;
                 pescaNuoveCarte(numeroDaPescare);
                 numeroSelezionate = 0;
-                updatePilaScarti();
+                //updatePilaScarti();
                 aggiornaHUD();
     
-                // Controlli di fine round
-                if (punteggio >= punteggioMinimo) {
+                if (punteggioCorrente >= punteggioMinimo) {
                     alert("Hai raggiunto il punteggio minimo per questo round! Vai allo shop.");
                     roundCorrente++;
-                    punteggioMinimo = punteggiMinimi[roundCorrente] || punteggioMinimo;
+                    punteggioMinimo = punteggiMinimi[roundCorrente];    
                     carteScartate = [];
+                    maniRimaste = 3;
+                    scartiDisponibili = 2;
+                    punteggioCorrente = 0;
                     salvaStatoInSessione();
+                    aggiornaHUD();
                     fetch('../php/ante.php', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -229,15 +231,19 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (!data.success) {
                             throw new Error("Errore nella richiesta al server di passare allo shop.");
                         }
-                        //return data.json(); // opzionale
                     })
                     .catch(error => {
                         console.error("Errore nel fetch:", error);
                         alert("Errore nella comunicazione con il server per andare allo shop.");
                     });
+                    const maniSpan = document.getElementById('maniRimaste');
+                    const scartiSpan = document.getElementById('scarti');
+                    const punteggioRoundSpan = document.getElementById('punteggioRound');
+                    
+                    if (maniSpan) maniSpan.textContent = data.maniRimaste;
+                    if (scartiSpan) scartiSpan.textContent = data.scarti;
+                    if (punteggioRoundSpan) punteggioRoundSpan.textContent = data.punteggioRound;
                     mostraSolo('shopDiv');
-
-                    //mostraSolo("shopDiv");
                 } else if (maniRimaste === 0) {
                     alert("Hai perso! Punteggio insufficiente.");
                     carteScartate = [];
@@ -258,15 +264,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         console.error("Errore nel fetch:", error);
                         alert("Errore nella comunicazione con il server per andare a schermata iniziale.");
                     });
-                    mostraSolo(then.targetDiv);
+                    mostraSolo("schermataInizialeDiv");
                 }
             });
         }, 600);
     });
     
-            
-
-    // Fetch iniziale carte centrali
     fetch('../php/ante.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -310,9 +313,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
         setTimeout(() => {
             selezionate.forEach(carta => carta.remove());
-            updatePilaScarti();
+            //updatePilaScarti();
             numeroSelezionate = 0;
-            pescaNuoveCarte(selezionate.length); // 👈 Qui viene pescato lo stesso numero di carte
+            pescaNuoveCarte(selezionate.length); 
         }, 600);
     });
     caricaStatoDaSessione();
