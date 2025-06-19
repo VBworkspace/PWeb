@@ -18,6 +18,13 @@ if (!$connection) {
 header('Content-Type: application/json');
 
 $action = $input['action'] ?? null;
+if (!isset($_SESSION['round'])) {
+    $_SESSION['round'] = 0;  // Imposta un valore di default per il round
+    $_SESSION['punteggioTotale'] = 0;
+    $_SESSION['mani_rimaste'] = 3;
+    $_SESSION['scarti_disponibili'] = 2;
+    $_SESSION['punteggioCorrente'] = 0;
+}
 
 function pescaCarte($quanti = 1) {
     if (!isset($_SESSION['mazzo']) || count($_SESSION['mazzo']) < $quanti) {
@@ -113,13 +120,15 @@ switch ($action) {
     case 'caricaStato':
         echo json_encode([
             'round' => $_SESSION['round'] ?? 0,
-            'punteggioMassimo' => $_SESSION['punteggioMassimo'] ?? 0
+            'punteggioTotale' => $_SESSION['punteggioTotale'] ?? 0,
+            'mani' => $_SESSION['mani_rimaste'],
+            'scarti' => $_SESSION['scarti_disponibili']
         ]);
         exit;
 
     case 'salvaStato':
         $_SESSION['round'] = $input['round'] ?? $_SESSION['round'] ?? 0;
-        $_SESSION['punteggioMassimo'] = $input['punteggioMassimo'] ?? $_SESSION['punteggioMassimo'] ?? 0;
+        $_SESSION['punteggioTotale'] += $input['punteggioTotale'];
         echo json_encode(['success' => true]);
         exit;
 
@@ -135,8 +144,31 @@ switch ($action) {
             }
             shuffle($_SESSION['mazzo']);
         }
-        $_SESSION['fase'] = 'shop';
+        //$_SESSION['punteggio_totale'] = 0;
+        $_SESSION['fase'] = 'shop';         // lo inizializzo 2 volte
         echo json_encode(['success' => true]);
+        exit;
+
+    case 'resetGame':
+        $semi = ['cuori', 'quadri', 'fiori', 'picche'];
+            $valori = range(1, 13);
+            $_SESSION['mazzo'] = [];
+            foreach ($semi as $seme) {
+                foreach ($valori as $valore) {
+                    $_SESSION['mazzo'][] = ['numero' => $valore, 'seme' => $seme];
+                }
+            }
+            shuffle($_SESSION['mazzo']);
+            echo json_encode(['success' => true, 'scarti' => $_SESSION['scarti_rimasti'], 'mani' => $_SESSION['mani_rimaste']]);
+        exit;
+        
+    case 'startGame':
+        $_SESSION['fase'] = 'shop';
+        $_SESSION['round'] = 0;
+        $_SESSION['mani_rimaste'] = 3;
+        $_SESSION['scarti_rimasti'] = 2;
+        $_SESSION['punteggioTotale'] = 0;               // non era punteggioTotale?
+        echo json_encode(['success' => true, 'targetDiv' => 'shopDiv']);
         exit;
 
     case 'mostraClassifica':
@@ -154,27 +186,30 @@ switch ($action) {
         $stmt->close();
         exit;
 
-    case 'startGame':
-        $_SESSION['fase'] = 'shop';
-        $_SESSION['round'] = 1;
-        $_SESSION['mani_rimaste'] = 3;
-        $_SESSION['scarti_rimasti'] = 2;
-        $_SESSION['punteggioTotale'] = 0;
-        echo json_encode(['success' => true, 'targetDiv' => 'shopDiv']);
-        exit;
+    //case 'usaMano':
+    //    if (!isset($_SESSION['giocatore_id'])) {
+    //        echo json_encode(['success' => false, 'message' => 'Non autenticato', 'targetDiv' => 'loginDiv']);
+    //        exit;
+    //    }
+    //    
+    //    exit;
+
 
     case 'vaiAdAnte':
         if (!isset($_SESSION['giocatore_id'])) {
             echo json_encode(['success' => false, 'message' => 'Non autenticato', 'targetDiv' => 'loginDiv']);
             exit;
         }
-
         if ($_SESSION['fase'] === 'shop') {
             $_SESSION['fase'] = 'ante';
+            $_SESSION['punteggioCorrente'] = 0;
             echo json_encode(['success' => true,
                 'targetDiv' => 'anteDiv',
                 'maniTot' => $_SESSION['mani_rimaste'],
-                'scartiTot' => $_SESSION['scarti_rimasti']]);
+                'scartiTot' => $_SESSION['scarti_rimasti'],
+                'puntCorrente' => $_SESSION['punteggioCorrente'],
+                'round' => $_SESSION['round']
+            ]);
             exit;
         } else {
             echo json_encode(['success' => false, 'message' => 'Accesso non consentito', 'targetDiv' => 'loginDiv']);
@@ -186,14 +221,14 @@ switch ($action) {
             echo json_encode(['success' => false, 'message' => 'Non autenticato', 'targetDiv' => 'loginDiv']);
             exit;
         }
-
         if ($_SESSION['fase'] === 'ante') {
-            $_SESSION['punteggioTotale'] += $input['puntiTot'] ?? 0;
+            //$_SESSION['punteggioTotale'] += $input['puntiTot'] ?? 0;
+            $_SESSION['punteggioCorrente'] = 0;
             $_SESSION['fase'] = 'shop';
             $_SESSION['mani_rimaste'] = 3;
             $_SESSION['scarti_rimasti'] = 2;
             $_SESSION['punteggio_round'] = 0;
-            $_SESSION['round'] = ($_SESSION['round'] ?? 1) + 1;
+            $_SESSION['round'] += 1;
             echo json_encode(['success' => true, 'targetDiv' => 'shopDiv']);
             exit;
         } else {
@@ -222,8 +257,14 @@ switch ($action) {
             echo json_encode(['success' => false, 'message' => 'Non autenticato']);
             exit;
         }
+        if($_SESSION['punteggioTotale'] < 1000){
+            echo json_encode(['success' => false, 'message' => 'Non hai abbastanza punti per comprare l\'upgrade']);
+            exit;
+            ////////////////////////////////////////////////////////////////////////////////////
+        }
+        $_SESSION['punteggioTotale'] = $_SESSION['punteggioTotale'] - 1000;
         $_SESSION['mani_rimaste'] = 4;
-        echo json_encode(['success' => true]);
+        echo json_encode(['success' => true, 'punteggioAggiornato' => $_SESSION['punteggioTotale']]);
         exit;
 
     case 'compraScarto':
@@ -231,8 +272,14 @@ switch ($action) {
             echo json_encode(['success' => false, 'message' => 'Non autenticato']);
             exit;
         }
-        $_SESSION['scarti_rimasti'] = 3;
-        echo json_encode(['success' => true]);
+        if($_SESSION['punteggioTotale'] < 1000){
+            echo json_encode(['success' => false, 'message' => 'Non hai abbastanza punti per comprare l\'upgrade']);
+            exit;
+            ////////////////////////////////////////////////////////////////////////////////////
+        }
+        $_SESSION['punteggioTotale'] = $_SESSION['punteggioTotale'] - 1000;
+        $_SESSION['scarti_disponibili'] = 3;
+        echo json_encode(['success' => true, 'punteggioAggiornato' => $_SESSION['punteggioTotale']]);
         exit;
 
     default:
