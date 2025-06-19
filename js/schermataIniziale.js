@@ -29,8 +29,13 @@ document.addEventListener("DOMContentLoaded", () => {
             });
             const result2 = await response2.json();
 
-            if (result.success && result.targetDiv && result2.success) {
+            if (result.success && result2.success) {    // && result.targetDiv
                 mostraSolo(result.targetDiv);
+                fetch('../php/ante.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'caricaStatus',  })
+                });
             } else {
                 alert(result.message || 'Errore durante l\'avvio del gioco.'); 
             }
