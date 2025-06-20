@@ -1,0 +1,349 @@
+"use strict";
+document.addEventListener('DOMContentLoaded', () => {
+    
+    const elementi = ["loginDiv", "registrazioneDiv", "shopDiv", "anteDiv", "schermataInizialeDiv"];
+    function mostraSolo(idDaMostrare) {
+        elementi.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.classList.add("hidden");
+        });
+        const target = document.getElementById(idDaMostrare);
+        if (target) target.classList.remove("hidden");
+    }
+
+    const areaCentrale = document.querySelector('.carte-centrali');
+    const giocaButton = document.getElementById('giocaButton');
+    const scartaButton = document.getElementById('scartaButton');
+    const manoPokerDiv = document.querySelector('.manoPoker');
+    //const punteggioSpan = document.getElementById('punteggio');
+    const maniRimasteSpan = document.getElementById('maniRimaste');
+    //const scartiDisponibiliSpan = document.getElementById('scartiDisponibili');
+    const ordinaNumeroBtn = document.getElementById('ordinaNumero');
+    const ordinaSemeRankBtn = document.getElementById('ordinaSemeRank');
+    const roundInfo = document.getElementById("round-info");
+    const punteggioRoundSpan = document.getElementById('puntMinimo');
+    const punteggioTotaleSpan = document.getElementById('punteggioTotale');
+
+    const punteggiMinimi = [300, 450, 500, 650, 800, 1000, 2000, 3000, 5000];
+
+    let roundCorrente = 0;
+    let punteggioMinimo = punteggiMinimi[0];
+    let punteggioCorrente = 0;
+    let maniRimaste = 3;
+    let scartiDisponibili = 2;
+    let carteScartate = [];
+    let carteCentrali = [];
+    let numeroSelezionate = 0;
+
+    function aggiornaHUD(valore, id) {
+        const elemento = document.getElementById(id);
+        if (elemento) elemento.textContent = valore;
+    }
+
+    function ordinaPerNumero(arr) {
+        numeroSelezionate = 0;
+        return arr.sort((a, b) => b.numero - a.numero);
+    }
+
+    function ordinaPerSemeERank(arr) {
+        const ordineSemi = { 'cuori': 4, 'quadri': 3, 'fiori': 2, 'picche': 1 };
+        numeroSelezionate = 0;
+        return arr.sort((a, b) => ordineSemi[b.seme] - ordineSemi[a.seme] || b.numero - a.numero);
+    }
+
+    function renderCarte(carte) {
+        areaCentrale.innerHTML = '';
+        carte.forEach(carta => {
+            const img = document.createElement('img');
+            img.src = `../carte/${carta.seme}/${carta.numero}.svg`;
+            img.alt = `Carta ${carta.numero} di ${carta.seme}`;
+            img.classList.add('carta');
+            img.dataset.numero = carta.numero;
+            img.dataset.seme = carta.seme;
+            img.addEventListener('click', () => {
+                if (numeroSelezionate === 5 && !img.classList.contains('selezionata')) return;
+                img.classList.toggle('selezionata');
+                numeroSelezionate += img.classList.contains('selezionata') ? 1 : -1;
+            });
+            areaCentrale.appendChild(img);
+        });
+    }
+
+    ordinaNumeroBtn.addEventListener('click', () => {
+        carteCentrali = ordinaPerNumero(carteCentrali);
+        renderCarte(carteCentrali);
+    });
+
+    ordinaSemeRankBtn.addEventListener('click', () => {
+        carteCentrali = ordinaPerSemeERank(carteCentrali);
+        renderCarte(carteCentrali);
+    });
+
+    async function pescaNuoveCarte(n) {
+        try {
+            const res = await fetch('../php/ante.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'pesca', quanti: n })
+            });
+            const data = await res.json();
+            if (data.carte) {
+                const carteAttuali = [...areaCentrale.querySelectorAll('.carta')].filter(c => !c.classList.contains('selezionata')).map(c => ({
+                    numero: parseInt(c.dataset.numero),
+                    seme: c.dataset.seme
+                }));
+                carteCentrali = carteAttuali.concat(data.carte);
+                renderCarte(carteCentrali);
+            }
+            carteScartate = [];
+        } catch (error) {
+            console.error("Errore durante la pesca delle carte:", error);
+        }
+    }
+
+    async function caricaStatoDaSessione() {
+        try {
+            const res = await fetch('../php/ante.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'caricaStato' })
+            });
+            const data = await res.json();
+            if (data.round !== undefined) roundCorrente = data.round;
+            if (data.punteggioTotale !== undefined) punteggioCorrente = data.punteggioTotale;
+            punteggioMinimo = punteggiMinimi[roundCorrente] || punteggiMinimi.at(-1);
+            aggiornaHUD(punteggioMinimo, "puntMinimo");
+            aggiornaHUD(punteggioCorrente, "punteggio");
+            aggiornaHUD(data.mani ?? maniRimaste, "maniRimaste");
+            aggiornaHUD(data.scarti ?? scartiDisponibili, "scartiDisponibili");
+        } catch (e) {
+            punteggioMinimo = punteggiMinimi[roundCorrente];
+            aggiornaHUD(punteggioMinimo, "puntMinimo");
+        }
+    }
+
+    async function salvaStatoInSessione() {
+        try {
+            await fetch('../php/ante.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'salvaStato',
+                    round: roundCorrente,
+                    punteggioTotale: punteggioCorrente
+                })
+            });
+        } catch (e) {
+            console.error("Errore durante il salvataggio della sessione:", e);
+        }
+    }
+
+    giocaButton.addEventListener('click', giocaCarte);
+
+    async function giocaCarte() {
+        const carteGiocate = getCarteGiocate();
+    
+        if (!puoiGiocare(carteGiocate)) return;
+        decrementaMani();
+        animaScartoCarte();
+    
+        setTimeout(async () => {
+            try {
+                const valutazione = await valutaMano(carteGiocate);
+                await pescaNuoveCarte(valutazione.numeroDaPescare);
+                aggiornaHUD(punteggioCorrente, "punteggio");
+                if (punteggioCorrente >= punteggioMinimo) {
+                    await gestisciVittoriaRound();
+                } else if (maniRimaste === 0) {
+                    await gestisciSconfitta();
+                }
+            } catch (e) {
+                console.error("Errore in giocaCarte:", e);
+                alert("Errore nella comunicazione con il server.");
+            }
+        }, 600);
+    }
+    
+    function getCarteGiocate() {
+        return [...document.querySelectorAll('.carte-centrali .carta.selezionata')].map(carta => ({
+            numero: parseInt(carta.dataset.numero, 10),
+            seme: carta.dataset.seme
+        }));
+    }
+    
+    function puoiGiocare(carteGiocate) {
+        if (carteGiocate.length === 0 && carteScartate.length === 0) {
+            alert("Gioca o scarta almeno una carta!");
+            return false;
+        }
+        return true;
+    }
+    
+    function decrementaMani() {
+        maniRimaste = Number(maniRimasteSpan.textContent) - 1;
+        aggiornaHUD(maniRimaste, "maniRimaste");
+    }
+    
+    function animaScartoCarte() {
+        document.querySelectorAll('.carta.selezionata').forEach(c => {
+            c.classList.add('animazione-scarto');
+            setTimeout(() => c.remove(), 600);
+        });
+    }
+    
+    async function valutaMano(carteGiocate) {
+        const res = await fetch('../php/ante.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: 'valutaMano',
+                carte: carteGiocate,
+                scarti: carteScartate
+            })
+        });
+        const data = await res.json();
+        manoPokerDiv.textContent = 'Mano: ' + (data.result ?? 'N/A');
+        if (data.punteggio) punteggioCorrente += data.punteggio;
+        const numeroDaPescare = (data.scartiEffettivi ?? carteScartate.length) + carteGiocate.length;
+        return { numeroDaPescare };
+    }
+    
+    async function pescaNuoveCarte(n) {
+        try {
+            const res = await fetch('../php/ante.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'pesca', quanti: n })
+            });
+            const data = await res.json();
+            if (data.carte) {
+                const carteAttuali = [...areaCentrale.querySelectorAll('.carta')].filter(c => !c.classList.contains('selezionata')).map(c => ({
+                    numero: parseInt(c.dataset.numero),
+                    seme: c.dataset.seme
+                }));
+                carteCentrali = carteAttuali.concat(data.carte);
+                renderCarte(carteCentrali);
+            }
+            carteScartate = [];
+        } catch (error) {
+            console.error("Errore durante la pesca delle carte:", error);
+        }
+    }
+    
+    async function gestisciVittoriaRound() {
+        alert("Hai raggiunto il punteggio minimo per questo round! Vai allo shop.");
+        carteScartate = [];
+        carteCentrali = [];
+    
+        const stato = await caricaStatoRound();
+        roundCorrente = stato.round;
+        roundInfo.textContent = "Round: " + roundCorrente;
+        await salvaStatoInSessione();
+    
+        const reset = await fetchJson({ action: 'resetGame' });
+        if (!reset.success) throw new Error("Errore durante resetGame");
+    
+        scartiDisponibili = reset.scarti;
+        maniRimaste = reset.mani;
+        aggiornaHUD(maniRimaste, "maniRimaste");
+        aggiornaHUD(scartiDisponibili, "scartiDisponibili");
+    
+        punteggioCorrente = 0;
+        aggiornaHUD(0, "punteggio");
+    
+        const dataShop = await fetchJson({ action: 'vaiAdShop' });
+        if (!dataShop.success) throw new Error("Errore shop");
+    
+        aggiornaHUD(dataShop.maniRimaste ?? maniRimaste, "maniRimaste");
+        aggiornaHUD(dataShop.scarti ?? scartiDisponibili, "scartiDisponibili");
+        aggiornaHUD(dataShop.round, "round-info");
+        punteggioRoundSpan.textContent = dataShop.punteggioRound ?? 0;
+    
+        const finale = await caricaStatoRound();
+        punteggioTotaleSpan.textContent = finale.punteggioTotale ?? 0;
+    
+        mostraSolo('shopDiv');
+        areaCentrale.innerHTML = '';
+        carteCentrali = [];
+        await pescaNuoveCarte(8, true);   
+    }
+    
+    async function gestisciSconfitta() {
+        alert("Hai perso! Punteggio insufficiente.");
+        roundCorrente = 0;
+        carteScartate = [];
+        carteCentrali = [];
+        punteggioCorrente = 0;
+        aggiornaHUD(0, "punteggio");
+        await salvaStatoInSessione();
+        const data = await fetchJson({ action: 'vaiASchermataIniziale' });
+        if (!data.success) throw new Error("Errore tornare schermata iniziale");
+        mostraSolo("schermataInizialeDiv");
+    }
+    
+    async function caricaStatoRound() {
+        const res = await fetch('../php/ante.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'caricaStato' })
+        });
+        return await res.json();
+    }
+    
+    async function fetchJson(payload) {
+        const res = await fetch('../php/ante.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        return await res.json();
+    }
+    
+    scartaButton.addEventListener('click', async () => {
+        if (scartiDisponibili <= 0) {
+            alert("Hai esaurito gli scarti disponibili!");
+            return;
+        }
+
+        const selezionate = [...document.querySelectorAll('.carta.selezionata')].filter(carta => areaCentrale.contains(carta));
+        if (selezionate.length === 0) {
+            alert("Seleziona almeno una carta da scartare!");
+            return;
+        }
+
+        scartiDisponibili--;
+        aggiornaHUD(scartiDisponibili, "scartiDisponibili");
+
+        selezionate.forEach(carta => {
+            carteScartate.push({
+                numero: parseInt(carta.dataset.numero),
+                seme: carta.dataset.seme
+            });
+            carta.classList.add('animazione-scarto');
+        });
+
+        setTimeout(async () => {
+            selezionate.forEach(carta => carta.remove());
+            numeroSelezionate = 0;
+            await pescaNuoveCarte(selezionate.length);
+        }, 500);
+    });
+
+    (async () => {
+        await caricaStatoDaSessione();
+        try {
+            const res = await fetch('../php/ante.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'getCarteCentrali' })
+            });
+            const data = await res.json();
+            if (data.carte) {
+                carteCentrali = data.carte;
+                renderCarte(carteCentrali);
+            }
+        } catch (e) {
+            console.error("Errore nel caricamento carte iniziali:", e);
+        }
+    })();
+});
