@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const sezioni = ["loginDiv", "registrazioneDiv", "schermataInizialeDiv", "shopDiv", "anteDiv"];
+    const sezioni = ["loginDiv", "registrazioneDiv", "schermataInizialeDiv", "shopDiv", "anteDiv", "classificaDiv"];
 
     function mostraSolo(idDaMostrare) {
         sezioni.forEach(id => {
@@ -70,12 +70,26 @@ document.addEventListener("DOMContentLoaded", () => {
             const password = registerForm.password.value;
             const confirmPassword = registerForm.confirmPassword.value;
 
+            // Validazione lato client
             if (password !== confirmPassword) {
                 registerMsg.style.color = "red";
                 registerMsg.textContent = "Le password non coincidono.";
                 return;
             }
 
+            if (!/^[a-zA-Z0-9_]{4,16}$/.test(username)) {
+                registerMsg.style.color = "red";
+                registerMsg.textContent = "Il nome utente deve contenere solo lettere, numeri e underscore (_), con una lunghezza tra 4 e 16 caratteri.";
+                return;
+            }
+
+            if (!/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)[A-Za-z\d]{4,16}$/.test(password)) {
+                registerMsg.style.color = "red";
+                registerMsg.textContent = "La password deve avere una lunghezza compresa tra 4 e 16, deve avere una lettera maiuscola, una minuscola e un numero.";
+                return;
+            }
+
+            // Creazione dei dati del form da inviare al server
             const formData = new FormData();
             formData.append("username", username);
             formData.append("password", password);

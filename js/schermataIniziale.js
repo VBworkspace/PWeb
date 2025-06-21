@@ -1,13 +1,14 @@
+
 document.addEventListener("DOMContentLoaded", () => {
-    const elementi = ["loginDiv", "registrazioneDiv", "shopDiv", "anteDiv", "schermataInizialeDiv"];
+    const elementi = ["loginDiv", "registrazioneDiv", "shopDiv", "anteDiv", "schermataInizialeDiv", "classificaDiv"];
     function mostraSolo(idDaMostrare) {
-    elementi.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.classList.add("hidden");
-    });
-    const target = document.getElementById(idDaMostrare);
-    if (target) target.classList.remove("hidden");
-}
+        elementi.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.classList.add("hidden");
+        });
+        const target = document.getElementById(idDaMostrare);
+        if (target) target.classList.remove("hidden");
+    }
 // Mostra un messaggio di benvenuto statico o personalizzato
 
     document.getElementById('welcome-message').textContent = 'Bentornato/a nel gioco !';
@@ -29,8 +30,13 @@ document.addEventListener("DOMContentLoaded", () => {
             });
             const result2 = await response2.json();
 
-            if (result.success && result.targetDiv && result2.success) {
+            if (result.success && result2.success) {    // && result.targetDiv
                 mostraSolo(result.targetDiv);
+                fetch('../php/ante.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'caricaStatus',  })
+                });
             } else {
                 alert(result.message || 'Errore durante l\'avvio del gioco.'); 
             }
@@ -49,37 +55,56 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             const result = await response.json();
-
-            if (result.success) {
-                // Nascondo tutte le sezioni tranne classificaDiv
-                const elementi = ["loginDiv", "registrazioneDiv", "shopDiv", "anteDiv", "schermataInizialeDiv"];
-                elementi.forEach(id => {
-                    const el = document.getElementById(id);
-                    if (el) el.classList.add("hidden");
-                });
-                const classificaDiv = document.getElementById('classificaDiv');
-                classificaDiv.classList.remove("hidden");
-
-                // Pulisco il contenuto precedente
-                classificaDiv.innerHTML = '<h2>Classifica</h2>';
-
-                // Creo una lista ordinata con i dati della classifica
-                const ol = document.createElement('ol');
-
-                result.classifica.forEach(entry => {
-                    const li = document.createElement('li');
-                    li.textContent = `${entry.giocatore} - Punteggio: ${entry.punteggio}`;
-                    ol.appendChild(li);
-                });
-
-                classificaDiv.appendChild(ol);
-
-            } else {
-                alert(result.message || 'Errore nel caricamento della classifica.');
+            if(!result.success){
+                return;
             }
+            const classifica = result.classifica;
+            //console.log(result);
+            const tabella = document.getElementById("righeClassifica");
+            removeAllChildren(tabella);
+            for(let i = 0; i < classifica.length; i++){
+                console.log(classifica[i].username);
+                console.log(classifica[i].data);
+                console.log(classifica[i].punteggio);
+                const riga = document.createElement('tr');
+                const cella0 = document.createElement('td');
+                cella0.textContent = classifica[i].username;
+                const cella1 = document.createElement('td');
+                cella1.textContent = classifica[i].punteggio;
+                const cella2 = document.createElement('td');
+                cella2.textContent = classifica[i].data;
+                riga.appendChild(cella0);
+                riga.appendChild(cella1);
+                riga.appendChild(cella2);
+                tabella.appendChild(riga);
+            }
+            mostraSolo("classificaDiv");
+            const indietro = document.getElementById("schermataDaClassifica");
+            indietro.addEventListener('click', tornaSchermata);
+            
         } catch (err) {
-        console.error(err);
-        alert('Errore di rete o del server.');
+            console.error(err);
+            alert('Errore di rete o del server.');
         }
     });
+
+    function removeAllChildren(element){
+        while(element.firstChild){
+            element.removeChild(element.firstChild);
+        }
+    }
+
+    async function tornaSchermata(){
+        const res = await fetch('../php/ante.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'vaiASchermataIniziale' })
+        });
+        const resp = await res.json();
+        if(!resp.success){
+            alert("Qualcosa è andato storto nel tornare alla schermata principale");
+            return;
+        }
+        mostraSolo("schermataInizialeDiv");
+    }
 });
