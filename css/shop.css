@@ -30,6 +30,7 @@ body{
 }
 
 .shop-purchases {
+    position: relative;
     flex-basis: 65%;
     background-color: #222;
     padding: 20px;
@@ -87,4 +88,16 @@ h1, h3 {
     border-radius: 5px;
     text-align: center;
 
+}
+
+#esci{
+    height: 50px;
+    width: 200px;
+    position: absolute; /* cambia qui */
+    bottom: 20px;       /* distanza dal fondo */
+    right: 20px;      
+    background-color: red;
+    text-align: center;
+    font-weight: bold;
+    font-size: larger;
 }

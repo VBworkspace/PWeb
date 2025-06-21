@@ -98,8 +98,7 @@ body {
 
 .carta:hover{
     transform: translateY(-10px);
-    transform: rotateY(1px);
-    
+    transform: rotateY(1deg);
 }
 
 .carta.selezionata {
@@ -190,6 +189,14 @@ body {
 .hud .stat span {
     color: #ffd700;
     font-weight: normal;
+}
+
+.hud > p{
+    margin: 1px;
+}
+
+.hud > h1{
+    margin: 3px;
 }
 
 #giocaButton, #scartaButton{

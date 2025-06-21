@@ -1,0 +1,67 @@
+/* Stile per la classifica */
+#classificaDiv {
+    margin-top: 30px;
+    background-color: #222;
+    border-radius: 10px;
+    box-shadow: 0 0 10px #333;
+    padding: 20px;
+    width: 80%;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+h2 {
+    font-size: 2rem;
+    color: #4CAF50;
+    margin-bottom: 20px;
+}
+
+#classificaTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#classificaTable th, #classificaTable td {
+    padding: 12px 15px;
+    border: 1px solid #444;
+    text-align: center;
+}
+
+#classificaTable th {
+    background-color: #333;
+    color: #fff;
+}
+
+#classificaTable td {
+    background-color: #222;
+    color: #fff;
+}
+
+#classificaTable td:nth-child(1) {
+    font-weight: bold;
+}
+
+#classificaTable td:nth-child(2), #classificaTable td:nth-child(3) {
+    font-size: 1.1rem;
+}
+
+/* Stili per le posizioni speciali (1°, 2°, 3°) */
+#classificaTable td.posizione-1 {
+    font-size: 2rem;
+    color: #FFD700;  /* Oro per il primo posto */
+}
+
+#classificaTable td.posizione-2 {
+    font-size: 1.8rem;
+    color: #C0C0C0;  /* Argento per il secondo posto */
+}
+
+#classificaTable td.posizione-3 {
+    font-size: 1.6rem;
+    color: #CD7F32;  /* Bronzo per il terzo posto */
+}
+
+#classificaTable td:not(.posizione-1):not(.posizione-2):not(.posizione-3) {
+    font-size: 1.2rem;
+}
