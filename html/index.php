@@ -1,9 +1,8 @@
 <?php
 session_start();
 
-// Verifica se 'round' esiste, altrimenti impostalo
 if (!isset($_SESSION['round'])) {
-    $_SESSION['round'] = 0;  // Imposta un valore di default per il round
+    $_SESSION['round'] = 0; 
     $_SESSION['punteggioTotale'] = 0;
     $_SESSION['mani_rimaste'] = 3;
     $_SESSION['scarti_disponibili'] = 2;
@@ -24,22 +23,18 @@ if (!isset($_SESSION['round'])) {
     <link rel="stylesheet" href="../css/classifica.css">
     <link rel="icon" href="../immagini/logo.svg">
     <script src="../js/auth.js" defer></script>
-    <script src="../js/schermataIniziale.js" defer></script>
-    <script src="../js/shop.js" defer></script>
-    <script src="../js/ante.js" defer></script>
+    <script type="module" src="../js/schermataIniziale.js" defer></script>
+    <script type="module" src="../js/shop.js" defer></script>
+    <script type="module" src="../js/ante.js" defer></script>
 </head>
 <body>
     <div id="loginDiv">
-
         <h2>Login</h2>
-        
         <form id="loginForm">
             <label>Nome utente:</label>
             <input type="text" name="username" required ><br>
-            
             <label>Password:</label>
             <input type="password" name="password" required><br>
-            
             <button type="submit">Accedi</button>
         </form>
         <p>Non hai un account? <a href="#" class="vai-a-registrazione">Registrati qui</a></p>
@@ -51,10 +46,8 @@ if (!isset($_SESSION['round'])) {
         <form id="registerForm">
             <label>Nome utente:</label><br>
             <input type="text" name="username" required><br>
-
             <label>Password:</label><br>
             <input type="password" name="password" id="password" required><br>
-
             <label>Ripeti Password:</label><br>
             <input type="password" name="confirmPassword" id="confirmPassword" required><br>
             <button type="submit">Registrati</button>
@@ -67,18 +60,11 @@ if (!isset($_SESSION['round'])) {
 
     <div id="schermataInizialeDiv">
         <div class="container">
-            <!-- Logo BALATRO al centro -->
             <h1 class="balatro">BALATRO</h1>
-    
-            <!-- Bottone GIOCA in basso a sinistra -->
             <button class="gioca" id="giocaBtn">GIOCA</button>
-    
-            <!-- Bottone CLASSIFICA in basso a destra -->
             <button class="classifica" id="classificaBtn">CLASSIFICA</button>
-    
-            <!-- Icona utente in alto a destra -->
-            <a href="profilo.php" class="user-icon">
-                <img src="../immagini/user-icon.svg" alt="Icona Utente">
+            <a id="logout-icon">
+                <img src="../immagini/logout.svg">
             </a>
         </div>
     
@@ -89,30 +75,28 @@ if (!isset($_SESSION['round'])) {
         <h1 id="round-info-h">Benvenuto nello Shop!</h1>
 
         <div class="shop-container">
-            <!-- Sezione sinistra (Info partita) -->
             <div class="shop-info">
-                <h1>SHOP</h1>
+                <div id="shop-titolo">
+                    <h1>SHOP</h1>
+                </div>
 
                 <div class="score">
                     <p>Punteggio: <span id="punteggioTotale">0</span></p>
                 </div>
 
                 <div class="bottom-info">
-                    <p>Run Info</p>
-                    
-                    <p>Round: </p> <p id="round-info">1</p>
+                    <p>Round: <p id="round-info">1</p> </p> 
                 </div>
             </div>
 
-            <!-- Sezione destra (Acquisti + Powerup) -->
             <div class="shop-purchases">
                 <button class="next-round" id="vaiGioco">Next Round</button>
 
                 <div class="upgrades">
                     <h3>Upgrades disponibili</h3>
                     <div class="upgrade-list">
-                        <div class="upgrade-slot" id="upM">[+1 Mano (1000 punti)]</div>
-                        <div class="upgrade-slot" id="upS">[+1 Scarto (1000 punti)]</div>
+                        <div class="upgrade-slot" id="upM">+1 Mano, costo:  1000 punti</div>
+                        <div class="upgrade-slot" id="upS">+1 Scarto, costo:  1000 punti</div>
                     </div>
                 </div>
                <button id="esci">Esci</button>
@@ -153,7 +137,6 @@ if (!isset($_SESSION['round'])) {
                 
             </div>
             <div class="c">
-                <!-- BOTTONE ORDINA AGGIUNTI -->
                 <div style="margin-bottom: 10px;">
                     <button id="ordinaNumero">Ordina per Numero</button>
                     <button id="ordinaSemeRank">Ordina per Colore</button>
@@ -163,15 +146,21 @@ if (!isset($_SESSION['round'])) {
             </div>
     
             <div class="g">
+                <div class="manoPoker"></div>
                 <button id="giocaButton">Gioca</button>
                 <button id="scartaButton">Scarta</button>
                 <div class="area-mano"></div>
-                <div class="manoPoker"></div>
                 <div class="status"></div>
                 <div class="area-scarti">
                     <img id="dorsoScarti" src="../carte/dorso.svg" alt="Pila Scarti">
                 </div>
             </div>
+            <dialog id="dialSconfitta">
+                    <p id="testoDialog">Hai perso :(</p>
+                    <form method="dialog">
+                        <button id="conferma">Torna alla schermata principale</button>
+                    </form>
+               </dialog>
         </div>
     </div>
 
