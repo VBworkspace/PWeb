@@ -1,6 +1,11 @@
+import { compraM, compraS, addListeners, removeListeners } from './shop.js';
+const upgradeM = document.getElementById("upM");
+const upgradeS = document.getElementById("upS");
 
 document.addEventListener("DOMContentLoaded", () => {
     const elementi = ["loginDiv", "registrazioneDiv", "shopDiv", "anteDiv", "schermataInizialeDiv", "classificaDiv"];
+
+
     function mostraSolo(idDaMostrare) {
         elementi.forEach(id => {
             const el = document.getElementById(id);
@@ -9,11 +14,31 @@ document.addEventListener("DOMContentLoaded", () => {
         const target = document.getElementById(idDaMostrare);
         if (target) target.classList.remove("hidden");
     }
-// Mostra un messaggio di benvenuto statico o personalizzato
 
     document.getElementById('welcome-message').textContent = 'Bentornato/a nel gioco !';
+    const logoutBtn = document.getElementById("logout-icon");
+    logoutBtn.addEventListener('click', logout);
 
-// Azione per il bottone GIOCA
+    async function logout() {
+        try {
+            const response = await fetch('../php/logout.php', {
+                method: 'POST',
+            });
+            const result = await response.json();
+            if (result.success) {
+                mostraSolo("loginDiv");
+                removeListeners();
+                addListeners();
+
+                alert("Logout eseguito con successo!");
+            } else {
+                alert('Errore durante il logout');
+            }
+        } catch (err) {
+            console.error('Errore di rete durante il logout:', err);
+        }
+    }
+    
     document.getElementById('giocaBtn').addEventListener('click', async () => {
         try {
             const response = await fetch('../php/ante.php', {
@@ -59,7 +84,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
             const classifica = result.classifica;
-            //console.log(result);
             const tabella = document.getElementById("righeClassifica");
             removeAllChildren(tabella);
             for(let i = 0; i < classifica.length; i++){

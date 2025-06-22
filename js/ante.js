@@ -1,3 +1,8 @@
+const upgradeM = document.getElementById("upM");
+const upgradeS = document.getElementById("upS");
+import { compraM, compraS, addListeners, removeListeners } from './shop.js';
+const punteggiMinimi = [0,300, 450, 500, 650, 800, 1000, 2000, 3000, 4000, 5000, 7000, 10000, 20000];
+
 "use strict";
 document.addEventListener('DOMContentLoaded', () => {
     
@@ -17,14 +22,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const manoPokerDiv = document.querySelector('.manoPoker');
     //const punteggioSpan = document.getElementById('punteggio');
     const maniRimasteSpan = document.getElementById('maniRimaste');
-    const scartiDisponibiliSpan = document.getElementById('scartiDisponibili');
+    //const scartiDisponibiliSpan = document.getElementById('scartiDisponibili');
     const ordinaNumeroBtn = document.getElementById('ordinaNumero');
     const ordinaSemeRankBtn = document.getElementById('ordinaSemeRank');
     const roundInfo = document.getElementById("round-info");
-    const punteggioRoundSpan = document.getElementById('puntMinimo');
-    const punteggioTotaleSpan = document.getElementById('punteggioTotale');
-
-    const punteggiMinimi = [0,300, 450, 500, 650, 800, 1000, 2000, 3000, 5000];
+    //const punteggioRoundSpan = document.getElementById('puntMinimo');
+    //const punteggioTotaleSpan = document.getElementById('punteggioTotale');
 
     let roundCorrente = 1;
     let punteggioMinimo = punteggiMinimi[1];
@@ -93,9 +96,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     seme: c.dataset.seme
                 }));
                 carteCentrali = carteAttuali.concat(data.carte);
-                renderCarte(carteCentrali);  // FONDAMENTALE
+                renderCarte(carteCentrali);
             }
             carteScartate = [];
+            numeroSelezionate = 0;
         } catch (error) {
             console.error("Errore durante la pesca delle carte:", error);
         }
@@ -110,7 +114,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const data = await res.json();
             if (data.round !== undefined) roundCorrente = data.round;
-            //if (data.punteggioTotale !== undefined) punteggioCorrente = data.punteggioTotale; //qui incasinava tutto
             punteggioMinimo = punteggiMinimi[data.round] || punteggiMinimi.at(-1);
             //console.log("Sono in ante, punt minimo: " + punteggioMinimo);
             aggiornaHUD(punteggioMinimo, "puntMinimo");
@@ -166,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 //console.log("scarti rimasti: " + scartiDisponibiliSpan.textContent);
                 giocaButton.addEventListener('click', giocaCarte);
                 scartaButton.addEventListener('click', scartaCarte);
-                //console.log("sono in giocaCarte, puntminimi: " + punteggiMinimi[data.round] + ", round: " + data.round + ", punteggio corrente: " + punteggioCorrente);
+                numeroSelezionate = 0;
                 if (punteggioCorrente >= punteggiMinimi[data.round]) {
                     await gestisciVittoriaRound();
                 } else if (maniRimaste === 0) {
@@ -197,7 +200,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-
         scartiDisponibili--;
         aggiornaHUD(scartiDisponibili, "scartiDisponibili");
 
@@ -215,6 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
             await pescaNuoveCarte(selezionate.length);
             giocaButton.addEventListener('click', giocaCarte);
             scartaButton.addEventListener('click', scartaCarte);
+            numeroSelezionate = 0;
         }, 500);
     }
     
@@ -258,7 +261,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const data = await res.json();
         manoPokerDiv.textContent = 'Mano: ' + (data.result ?? 'N/A');
         if (data.punteggio) punteggioCorrente += data.punteggio;
-        //console.log(punteggioMinimo);
         const numeroDaPescare = (data.scartiEffettivi ?? carteScartate.length) + carteGiocate.length;
         return { numeroDaPescare };
     }
@@ -270,9 +272,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action: 'salvaHighscore' })
             });
-    
             const data = await res.json();
-    
             if (data.success) {
                 console.log("Highscore:", data.highscore);
                 console.log(data.username);
@@ -305,21 +305,19 @@ document.addEventListener('DOMContentLoaded', () => {
         maniRimaste = reset.mani;
         aggiornaHUD(maniRimaste, "maniRimaste");
         aggiornaHUD(scartiDisponibili, "scartiDisponibili");
-    
         aggiornaHUD(0, "punteggio");
-    
+        manoPokerDiv.textContent = " ";
         const dataShop = await fetchJson({ action: 'vaiAdShop' });
         if (!dataShop.success) throw new Error("Errore shop");
-
-        await caricaStatoDaSessione();
+        //await caricaStatoDaSessione();
         //aggiornaHUD(dataShop.maniRimaste ?? maniRimaste, "maniRimaste");
+        aggiornaHUD(dataShop.punteggioRound, "puntMinimo");
         //aggiornaHUD(dataShop.scarti ?? scartiDisponibili, "scartiDisponibili");
         //aggiornaHUD(dataShop.round, "round-info");
-        punteggioRoundSpan.textContent = dataShop.punteggioRound ?? 0;
-    
+        //punteggioRoundSpan.textContent = dataShop.punteggioRound ?? 0;    ///////////////////
         const finale = await caricaStatoRound();
-        punteggioTotaleSpan.textContent = finale.punteggioTotale ?? 0;
-    
+        aggiornaHUD(finale.punteggioTotale, "punteggioTotale");
+        //punteggioTotaleSpan.textContent = finale.punteggioTotale ?? 0;    ///////////////////
         mostraSolo('shopDiv');
         areaCentrale.innerHTML = '';
         carteCentrali = [];
@@ -335,18 +333,27 @@ document.addEventListener('DOMContentLoaded', () => {
         carteScartate = [];
         carteCentrali = [];
         punteggioCorrente = 0;
+        scartiDisponibili = 2;
+        maniRimaste = 3;
         aggiornaHUD(0, "punteggio");
         aggiornaHUD(0, "punteggioTotale");
         aggiornaHUD(0, "round-info");
         aggiornaHUD(3, "maniRimaste");
         aggiornaHUD(2, "scartiDisponibili");
+        removeListeners();
+        addListeners();
+        aggiornaHUD("[+1 Scarto (1000 punti)]", "upS");
+        aggiornaHUD("[+1 Mano (1000 punti)]", "upM");
+        areaCentrale.innerHTML = '';
+        carteCentrali = [];
+        await pescaNuoveCarte(8, true); 
         await salvaStatoInSessione();
         const data = await fetchJson({ action: 'vaiASchermataIniziale' });
         if (!data.success) throw new Error("Errore tornare schermata iniziale");
         await caricaStatoDaSessione();
         mostraSolo("schermataInizialeDiv");
     }
-    
+
     async function caricaStatoRound() {
         const res = await fetch('../php/ante.php', {
             method: 'POST',
@@ -364,8 +371,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         return await res.json();
     }
-    
-    
 
     (async () => {
         await caricaStatoDaSessione();

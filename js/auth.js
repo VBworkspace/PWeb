@@ -28,7 +28,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // LOGIN
     const loginForm = document.getElementById("loginForm");
     const loginError = document.getElementById("error");
 
@@ -58,7 +57,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // REGISTRAZIONE
     const registerForm = document.getElementById("registerForm");
     const registerMsg = document.getElementById("msg");
 
@@ -76,7 +74,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 registerMsg.textContent = "Le password non coincidono.";
                 return;
             }
-
             if (!/^[a-zA-Z0-9_]{4,16}$/.test(username)) {
                 registerMsg.style.color = "red";
                 registerMsg.textContent = "Il nome utente deve contenere solo lettere, numeri e underscore (_), con una lunghezza tra 4 e 16 caratteri.";
@@ -89,7 +86,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            // Creazione dei dati del form da inviare al server
             const formData = new FormData();
             formData.append("username", username);
             formData.append("password", password);
