@@ -1,6 +1,6 @@
 <?php
 define("DBHOST", "localhost");
-define("DBNAME", "balatro_db");
+define("DBNAME", "bacchereti_635327");
 define("DBUSER", "root");
 define("DBPASS", "");
 ?>

@@ -19,7 +19,7 @@ header('Content-Type: application/json');
 
 $action = $input['action'] ?? null;
 if (!isset($_SESSION['round'])) {
-    $_SESSION['round'] = 1;  // Imposta un valore di default per il round
+    $_SESSION['round'] = 1; 
     $_SESSION['punteggioTotale'] = 0;
     $_SESSION['mani_rimaste'] = 3;
     $_SESSION['scarti_disponibili'] = 2;
@@ -170,7 +170,7 @@ switch ($action) {
             shuffle($_SESSION['mazzo']);
         }
         //$_SESSION['punteggio_totale'] = 0;
-        $_SESSION['fase'] = 'shop';         // lo inizializzo 2 volte
+        $_SESSION['fase'] = 'shop';    
         echo json_encode(['success' => true]);
         exit;
 
@@ -241,8 +241,6 @@ switch ($action) {
         }
         $stmt->close();
         file_put_contents('debug.log', print_r($input, true), FILE_APPEND);
-
-    
         echo json_encode(['success' => true, 'classifica' => $classifica]);
         exit;
     
