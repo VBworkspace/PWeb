@@ -14,7 +14,7 @@ body {
         "s g g"
         "s c c"
         "s f f";
-    grid-template-columns: 1fr 2fr;
+    grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: 1fr 2fr 1fr 1fr;
     height: 100vh;
     gap: 10px;
@@ -29,7 +29,7 @@ body {
     align-items: center;
     justify-content: center;
     border-radius: 10px;
-    min-height: 0; /* evita overflow */
+    min-height: 0;
 }
 
 .s{
@@ -65,7 +65,6 @@ body {
     align-items: center; /* Centra verticalmente le carte */
     gap: 10px; /* Spazio tra le carte */
     padding: 20px; /* Aggiunge un po' di spazio interno */
-    overflow-x: auto; /* Permette di scorrere orizzontalmente se ci sono troppe carte */
 }
 
 .c{
@@ -97,8 +96,7 @@ body {
 }
 
 .carta:hover{
-    transform: translateY(-10px);
-    transform: rotateY(1deg);
+    transform: translateY(-10px) rotateY(1deg);
 }
 
 .carta.selezionata {
@@ -110,6 +108,8 @@ body {
 
 .manoPoker{
     font-size: larger;
+    width: 100px;
+    height: 30px;
 }
 
 .pila-scarti {
@@ -199,10 +199,25 @@ body {
     margin: 3px;
 }
 
-#giocaButton, #scartaButton{
-    height: fit-content;
-    width: fit-content;
+#giocaButton, #scartaButton {
+    font-size: 1.2rem;      /* testo più grande */
+    font-weight: bold;      /* testo bold */
+    padding: 12px 24px;     /* più spazio interno */
+    border-radius: 8px;     /* angoli arrotondati */
+    cursor: pointer;
+    border: none;           /* rimuovi bordi di default */
+    color: white;
 }
+
+#giocaButton {
+    background-color: #4CAF50; /* verde */
+}
+
+#scartaButton {
+    background-color: #d32f2f; /* rosso più scuro */
+}
+
+
 #ordinaSemeRank, #ordinaNumero{
     height: fit-content;
     width: fit-content;

@@ -1,11 +1,13 @@
-body{
+body {
     background-color: #111;
     color: #fff;
     font-family: 'Arial', sans-serif;
     margin: 0;
 }
+
 #shopDiv {
     height: 100%;
+    font-weight: bold;
 }
 
 .shop-container {
@@ -17,6 +19,10 @@ body{
     width: 100vw;
 }
 
+#shop-titolo {
+    text-align: center;
+}
+
 .shop-info {
     flex-basis: 25%;
     background-color: #222;
@@ -25,7 +31,7 @@ body{
     box-shadow: 0 0 10px #333;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    gap: 20px;
     height: 80%;
 }
 
@@ -38,66 +44,103 @@ body{
     box-shadow: 0 0 10px #333;
     display: flex;
     flex-direction: column;
+    align-items: center;
     height: 80%;
 }
-
 
 h1, h3 {
     color: #ffcc00;
 }
 
 .score, .multipliers, .run-info, .bottom-info {
-    margin-top: 20px;
-    padding: 10px;
+    padding: 15px;
     background-color: #333;
     border-radius: 5px;
+    text-align: center;
+    font-size: 16px;
+}
+
+.bottom-info p {
+    margin: 5px 0;
+}
+
+#round-info {
+    display: inline;
 }
 
 .next-round {
-    width: 100%;
+    width: 200px;
+    margin: 30px auto 20px auto;
     padding: 15px;
     background-color: #4CAF50;
     color: white;
     font-size: 18px;
     border: none;
     border-radius: 5px;
-    margin-bottom: 20px;
     cursor: pointer;
+    display: block;
+    transition: transform 0.2s ease;
 }
-.upgrade-list{
-    flex: 1; /* Occupa spazio equamente */
+
+.next-round:hover {
+    transform: scale(1.05);
+}
+
+#esci {
+    height: 50px;
+    width: 200px;
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background-color: red;
+    text-align: center;
+    font-size: larger;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#esci:hover {
+    background-color: #cc0000;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0px #ff0; }
+    50% { box-shadow: 0 0 15px #ffd700; }
+    100% { box-shadow: 0 0 0px #ff0; }
+}
+
+.upgrades {
+    margin-top: 40px;
+    width: 100%;
+    text-align: center;
+}
+
+.upgrade-list {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 20px;
 }
 
 .upgrade-slot {
     background-color: #444;
+    border-radius: 10px;
+    width: 150px;
+    height: 100px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 10px;
-    border-radius: 5px;
     text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-
-.pianeti{
-    display: grid;  
-    grid-template-columns: 1fr 1fr;
-}
-
-.pianeti-slot{
-    background-color: #444;
-    margin-top: 10px;
-    padding: 10px;
-    border-radius: 5px;
-    text-align: center;
-
-}
-
-#esci{
-    height: 50px;
-    width: 200px;
-    position: absolute; /* cambia qui */
-    bottom: 20px;       /* distanza dal fondo */
-    right: 20px;      
-    background-color: red;
-    text-align: center;
-    font-weight: bold;
-    font-size: larger;
+.upgrade-slot:hover {
+    animation: pulse 1s infinite;
+    transform: translateY(-5px);
 }

@@ -94,28 +94,27 @@ body {
     background-color: #e53935;
 }
 
-.user-icon {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    width: 40px;
-    height: 40px;
-    background-color: #555;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: background-color 0.3s ease;
+#schermataInizialeDiv {
+    position: relative;
+    padding: 20px;
 }
 
-.user-icon img {
-    width: 70%;
-    height: 70%;
-    object-fit: contain;
+#logout-icon {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 999;
+    cursor: pointer;
 }
 
-.user-icon:hover {
-    background-color: #888;
+#logout-icon img {
+    width: 50px;
+    height: 50px;
+    transition: transform 0.2s ease-in-out;
+}
+
+#logout-icon:hover img {
+    transform: scale(1.1);
 }
 
 .hidden{
