@@ -1,6 +1,6 @@
 # PWeb
 
-Progetto di Progettazione Web, anno 24/25
+Progetto di Progettazione Web, anno 24/25. \r
 Il progetto simula un porting su Javascript e Html, con backend in Php e MySQL, del videogioco 'Balatro'. 
 E' stato creato su una base di pagine caricate dinamicamente per simulare i livelli: prima di ogni livello c'è uno
 shop in cui si possono acquistare potenziamenti usando come currency i punteggi accumulati nel livello precedente.
