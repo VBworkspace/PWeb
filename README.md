@@ -23,4 +23,4 @@ Il progetto è stato sviluppato utilizzando XAMPP come ambiente locale.
 2. Avviare i servizi Apache e MySQL tramite XAMPP.
 3. Importare il database tramite phpMyAdmin utilizzando il file SQL presente nella repository.
 4. Aprire il progetto tramite browser all'indirizzo:
-   `http://localhost/nome-progetto`
+   `http://pweb/index.php`
