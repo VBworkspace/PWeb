@@ -49,10 +49,10 @@ if ($result->num_rows === 1) {
         $_SESSION['username'] = $username;
         echo json_encode(['success' => true]);
     } else {
-        echo json_encode(['success' => false, 'message' => 'Password errata']);
+        echo json_encode(['success' => false, 'message' => 'Utente o password errati']);
     }
 } else {
-    echo json_encode(['success' => false, 'message' => 'Utente non trovato']);
+    echo json_encode(['success' => false, 'message' => 'Utente o password errati']);
 }
 
 $stmt->close();
